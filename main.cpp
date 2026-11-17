@@ -163,6 +163,53 @@ int main() {
                 cout << "Pazymys atnaujintas: " << senas << " -> " << mokPazym[i][pnr - 1] << "\n";
                 break;
             }
+            case 5: {
+                if (mokKiek == 0) {
+                    cout << "Sarase nera mokiniu.\n";
+                    break;
+                }
+                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
+                int nr = ivestiNumeri("mokinio", mokKiek);
+                if (nr == 0) {
+                    break;
+                }
+                int i = nr - 1;
+                if (pazKiek[i] == 0) {
+                    cout << "Mokinys " << mokVard[i] << " neturi pazymiu, vidurkio apskaiciuoti negalima.\n";
+                    break;
+                }
+                int suma = 0;
+                for (int j = 0; j < pazKiek[i]; j++) {
+                    suma += mokPazym[i][j];
+                }
+// Dalinant is double gaunamas tikslus rezultatas (int / int nupjautu trupmena)
+                double vidurkis = suma / (double) pazKiek[i];
+                cout << mokVard[i] << " vidurkis: " << vidurkis << "\n";
+                break;
+            }
+            case 6: {
+                if (mokKiek == 0) {
+                    cout << "Sarase nera mokiniu.\n";
+                    break;
+                }
+                cout << "Iveskite salinamo mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
+                int nr = ivestiNumeri("mokinio", mokKiek);
+                if (nr == 0) {
+                    break;
+                }
+                string pasalintas = mokVard[nr - 1];
+// Visus po salinamo esancius mokinius perstumiame per viena vieta atgal, kad neliktu tarpo
+                for (int i = nr - 1; i < mokKiek - 1; i++) {
+                    mokVard[i] = mokVard[i + 1];
+                    pazKiek[i] = pazKiek[i + 1];
+                    for (int j = 0; j < pazKiek[i]; j++) {
+                        mokPazym[i][j] = mokPazym[i + 1][j];
+                    }
+                }
+                mokKiek--;
+                cout << "Mokinys " << pasalintas << " pasalintas. Mokiniu sarase: " << mokKiek << "\n";
+                break;
+            }
             case 7:
                 cout << "Programa baigta.\n";
                 break;
