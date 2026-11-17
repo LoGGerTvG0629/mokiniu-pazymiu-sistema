@@ -29,6 +29,18 @@ int ivestiPazymi() {
     return p;
 }
 
+// Nuskaito numeri nuo 1 iki max. Jei numeris neteisingas - parodo leistina intervala ir praso is naujo.
+// Ivedus 0 grazinamas 0, t.y. grizti i meniu, duomenys nekeiciami
+int ivestiNumeri(string ko, int max) {
+    int nr = ivestiSkaiciu();
+    while (nr != 0 && (nr < 1 || nr > max)) {
+        cout << "Neteisingas " << ko << " numeris. Iveskite skaiciu nuo 1 iki " << max
+             << " (0 - grizti i meniu): ";
+        nr = ivestiSkaiciu();
+    }
+    return nr;
+}
+
 int main() {
     string mokVard[MAX_MOKINIU];              // vienmatis masyvas - mokiniu vardai
     int mokPazym[MAX_MOKINIU][MAX_PAZYMIU];   // dvimatis masyvas - eilute = mokinys, stulpelis = pazymys
@@ -97,6 +109,58 @@ int main() {
                     }
                     cout << "\n";
                 }
+                break;
+            }
+            case 3: {
+                if (mokKiek == 0) {
+                    cout << "Sarase nera mokiniu.\n";
+                    break;
+                }
+                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
+                int nr = ivestiNumeri("mokinio", mokKiek);
+                if (nr == 0) {
+                    break;
+                }
+                int i = nr - 1; // vartotojas skaiciuoja nuo 1, masyvo indeksai nuo 0
+                cout << mokVard[i] << " pazymiai: ";
+                if (pazKiek[i] == 0) {
+                    cout << "(pazymiu nera)";
+                }
+                for (int j = 0; j < pazKiek[i]; j++) {
+                    cout << mokPazym[i][j] << " ";
+                }
+                cout << "\n";
+                break;
+            }
+            case 4: {
+                if (mokKiek == 0) {
+                    cout << "Sarase nera mokiniu.\n";
+                    break;
+                }
+                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
+                int nr = ivestiNumeri("mokinio", mokKiek);
+                if (nr == 0) {
+                    break;
+                }
+                int i = nr - 1;
+                if (pazKiek[i] == 0) {
+                    cout << "Mokinys " << mokVard[i] << " neturi pazymiu, nera ka atnaujinti.\n";
+                    break;
+                }
+// Parodome mokinio pazymius su numeriais, kad butu aisku kuri keisti
+                cout << mokVard[i] << " pazymiai:\n";
+                for (int j = 0; j < pazKiek[i]; j++) {
+                    cout << "  " << j + 1 << ") " << mokPazym[i][j] << "\n";
+                }
+                cout << "Iveskite pazymio numeri (1-" << pazKiek[i] << ", 0 - grizti i meniu): ";
+                int pnr = ivestiNumeri("pazymio", pazKiek[i]);
+                if (pnr == 0) {
+                    break;
+                }
+                int senas = mokPazym[i][pnr - 1];
+                cout << "Iveskite nauja pazymi (1-10): ";
+                mokPazym[i][pnr - 1] = ivestiPazymi();
+                cout << "Pazymys atnaujintas: " << senas << " -> " << mokPazym[i][pnr - 1] << "\n";
                 break;
             }
             case 7:
