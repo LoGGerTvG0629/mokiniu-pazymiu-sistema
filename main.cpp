@@ -1,221 +1,217 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-#include <limits>
 
 using namespace std;
 
-const int MAX_MOKINIU = 100;
-const int MAX_PAZYMIU = 10;
+const int MAX_MOK = 100;
+const int MAX_PAZ = 10;
 
-// Nuskaito sveikaji skaiciu. Jei ivedama ne skaicius (pvz. raides), isvalo ivesti ir praso is naujo
-int ivestiSkaiciu() {
+// Patikrina, ar ivestas tikrai skaicius
+int gautiSkaiciu() {
     int x;
     while (!(cin >> x)) {
         cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Klaida: iveskite sveikaji skaiciu: ";
+        cin.ignore(1000, '\n');
+        cout << "Iveskite skaiciu: ";
     }
     return x;
 }
 
-// Nuskaito pazymi ir kartoja, kol jis bus skaleje nuo 1 iki 10
-int ivestiPazymi() {
-    int p = ivestiSkaiciu();
+int gautiPazymi() {
+    int p = gautiSkaiciu();
     while (p < 1 || p > 10) {
-        cout << "Neteisingas pazymys. Iveskite skaiciu nuo 1 iki 10: ";
-        p = ivestiSkaiciu();
+        cout << "Pazymys turi buti nuo 1 iki 10. Bandykite dar karta: ";
+        p = gautiSkaiciu();
     }
     return p;
 }
 
-// Nuskaito numeri nuo 1 iki max. Jei numeris neteisingas - parodo leistina intervala ir praso is naujo.
-// Ivedus 0 grazinamas 0, t.y. grizti i meniu, duomenys nekeiciami
-int ivestiNumeri(string ko, int max) {
-    int nr = ivestiSkaiciu();
+int gautiNumeri(int max) {
+    int nr = gautiSkaiciu();
     while (nr != 0 && (nr < 1 || nr > max)) {
-        cout << "Neteisingas " << ko << " numeris. Iveskite skaiciu nuo 1 iki " << max
-             << " (0 - grizti i meniu): ";
-        nr = ivestiSkaiciu();
+        cout << "Neteisingas numeris (galima 1-" << max << ", 0 - atsaukti): ";
+        nr = gautiSkaiciu();
     }
     return nr;
 }
 
 int main() {
-    string mokVard[MAX_MOKINIU];              // vienmatis masyvas - mokiniu vardai
-    int mokPazym[MAX_MOKINIU][MAX_PAZYMIU];   // dvimatis masyvas - eilute = mokinys, stulpelis = pazymys
-    int pazKiek[MAX_MOKINIU];                 // kiek pazymiu turi kiekvienas mokinys
-    int mokKiek = 0;                          // kiek mokiniu yra sarase
+    string vardai[MAX_MOK];
+    int pazymiai[MAX_MOK][MAX_PAZ];
+    int pazKiekis[MAX_MOK];
+    int kiekMokiniu = 0;
     int pasirinkimas = 0;
 
     cout << fixed << setprecision(2);
 
-// Meniu kartojamas, kol pasirenkama 7 (Iseiti)
     while (pasirinkimas != 7) {
-        cout << "\nMOKINIU PAZYMIU SISTEMA\n";
-        cout << "1. Ivesti mokini ir jo pazymius\n";
-        cout << "2. Perziureti visu mokiniu pazymius\n";
-        cout << "3. Perziureti konkretaus mokinio pazymius\n";
-        cout << "4. Atnaujinti pazymi\n";
-        cout << "5. Apskaiciuoti mokinio vidurki\n";
-        cout << "6. Pasalinti mokini\n";
+        cout << "\n--- MOKINIU PAZYMIAI ---\n";
+        cout << "1. Prideti mokini\n";
+        cout << "2. Visi mokiniai ir pazymiai\n";
+        cout << "3. Konkretaus mokinio pazymiai\n";
+        cout << "4. Keisti pazymi\n";
+        cout << "5. Mokinio vidurkis\n";
+        cout << "6. Istrinti mokini\n";
         cout << "7. Iseiti\n";
-        cout << "Pasirinkite veiksma: ";
-        pasirinkimas = ivestiSkaiciu();
+        cout << "Pasirinkimas: ";
+        pasirinkimas = gautiSkaiciu();
 
         switch (pasirinkimas) {
             case 1: {
-// Tikriname, ar nevirsytas mokiniu limitas
-                if (mokKiek >= MAX_MOKINIU) {
-                    cout << "Klaida: pasiektas mokiniu limitas (" << MAX_MOKINIU << ").\n";
+                if (kiekMokiniu >= MAX_MOK) {
+                    cout << "Sarasas pilnas!\n";
                     break;
                 }
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // isvalome likusi Enter po meniu pasirinkimo
-                cout << "Iveskite mokinio varda: ";
-                getline(cin, mokVard[mokKiek]);
-                while (mokVard[mokKiek].empty()) {
-                    cout << "Vardas negali buti tuscias. Iveskite varda: ";
-                    getline(cin, mokVard[mokKiek]);
+                cin.ignore();
+                cout << "Mokinio vardas: ";
+                getline(cin, vardai[kiekMokiniu]);
+                while (vardai[kiekMokiniu].empty()) {
+                    cout << "Iveskite varda: ";
+                    getline(cin, vardai[kiekMokiniu]);
                 }
-// Pazymiu kiekis ribojamas nuo 0 iki 10
-                cout << "Kiek pazymiu ivesite (0-" << MAX_PAZYMIU << ")? ";
-                int kiek = ivestiSkaiciu();
-                while (kiek < 0 || kiek > MAX_PAZYMIU) {
-                    cout << "Neteisingas kiekis. Iveskite skaiciu nuo 0 iki " << MAX_PAZYMIU << ": ";
-                    kiek = ivestiSkaiciu();
+
+                cout << "Kiek pazymiu ivesite (0-" << MAX_PAZ << ")? ";
+                int k = gautiSkaiciu();
+                while (k < 0 || k > MAX_PAZ) {
+                    cout << "Iveskite skaiciu nuo 0 iki " << MAX_PAZ << ": ";
+                    k = gautiSkaiciu();
                 }
-                for (int j = 0; j < kiek; j++) {
-                    cout << j + 1 << " pazymys: ";
-                    mokPazym[mokKiek][j] = ivestiPazymi();
+
+                for (int j = 0; j < k; j++) {
+                    cout << j + 1 << "-as pazymys: ";
+                    pazymiai[kiekMokiniu][j] = gautiPazymi();
                 }
-                pazKiek[mokKiek] = kiek;
-                mokKiek++;
-                cout << "Mokinys pridetas. Mokiniu sarase: " << mokKiek << "\n";
+                pazKiekis[kiekMokiniu] = k;
+                kiekMokiniu++;
+                cout << "Mokinys pridetas.\n";
                 break;
             }
+
             case 2: {
-                if (mokKiek == 0) {
-                    cout << "Sarase nera mokiniu.\n";
+                if (kiekMokiniu == 0) {
+                    cout << "Sarasas tuscias.\n";
                     break;
                 }
-// Isorinis ciklas eina per mokinius, vidinis - per to mokinio pazymius
-                for (int i = 0; i < mokKiek; i++) {
-                    cout << i + 1 << ". " << mokVard[i] << ": ";
-                    if (pazKiek[i] == 0) {
-                        cout << "(pazymiu nera)";
+                for (int i = 0; i < kiekMokiniu; i++) {
+                    cout << i + 1 << ". " << vardai[i] << ": ";
+                    if (pazKiekis[i] == 0) {
+                        cout << "pazymiu nera";
+                    } else {
+                        for (int j = 0; j < pazKiekis[i]; j++) {
+                            cout << pazymiai[i][j] << " ";
+                        }
                     }
-                    for (int j = 0; j < pazKiek[i]; j++) {
-                        cout << mokPazym[i][j] << " ";
-                    }
-                    cout << "\n";
+                    cout << endl;
                 }
                 break;
             }
+
             case 3: {
-                if (mokKiek == 0) {
-                    cout << "Sarase nera mokiniu.\n";
+                if (kiekMokiniu == 0) {
+                    cout << "Sarasas tuscias.\n";
                     break;
                 }
-                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
-                int nr = ivestiNumeri("mokinio", mokKiek);
-                if (nr == 0) {
-                    break;
-                }
-                int i = nr - 1; // vartotojas skaiciuoja nuo 1, masyvo indeksai nuo 0
-                cout << mokVard[i] << " pazymiai: ";
-                if (pazKiek[i] == 0) {
-                    cout << "(pazymiu nera)";
-                }
-                for (int j = 0; j < pazKiek[i]; j++) {
-                    cout << mokPazym[i][j] << " ";
-                }
-                cout << "\n";
-                break;
-            }
-            case 4: {
-                if (mokKiek == 0) {
-                    cout << "Sarase nera mokiniu.\n";
-                    break;
-                }
-                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
-                int nr = ivestiNumeri("mokinio", mokKiek);
-                if (nr == 0) {
-                    break;
-                }
-                int i = nr - 1;
-                if (pazKiek[i] == 0) {
-                    cout << "Mokinys " << mokVard[i] << " neturi pazymiu, nera ka atnaujinti.\n";
-                    break;
-                }
-// Parodome mokinio pazymius su numeriais, kad butu aisku kuri keisti
-                cout << mokVard[i] << " pazymiai:\n";
-                for (int j = 0; j < pazKiek[i]; j++) {
-                    cout << "  " << j + 1 << ") " << mokPazym[i][j] << "\n";
-                }
-                cout << "Iveskite pazymio numeri (1-" << pazKiek[i] << ", 0 - grizti i meniu): ";
-                int pnr = ivestiNumeri("pazymio", pazKiek[i]);
-                if (pnr == 0) {
-                    break;
-                }
-                int senas = mokPazym[i][pnr - 1];
-                cout << "Iveskite nauja pazymi (1-10): ";
-                mokPazym[i][pnr - 1] = ivestiPazymi();
-                cout << "Pazymys atnaujintas: " << senas << " -> " << mokPazym[i][pnr - 1] << "\n";
-                break;
-            }
-            case 5: {
-                if (mokKiek == 0) {
-                    cout << "Sarase nera mokiniu.\n";
-                    break;
-                }
-                cout << "Iveskite mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
-                int nr = ivestiNumeri("mokinio", mokKiek);
-                if (nr == 0) {
-                    break;
-                }
-                int i = nr - 1;
-                if (pazKiek[i] == 0) {
-                    cout << "Mokinys " << mokVard[i] << " neturi pazymiu, vidurkio apskaiciuoti negalima.\n";
-                    break;
-                }
-                int suma = 0;
-                for (int j = 0; j < pazKiek[i]; j++) {
-                    suma += mokPazym[i][j];
-                }
-// Dalinant is double gaunamas tikslus rezultatas (int / int nupjautu trupmena)
-                double vidurkis = suma / (double) pazKiek[i];
-                cout << mokVard[i] << " vidurkis: " << vidurkis << "\n";
-                break;
-            }
-            case 6: {
-                if (mokKiek == 0) {
-                    cout << "Sarase nera mokiniu.\n";
-                    break;
-                }
-                cout << "Iveskite salinamo mokinio numeri (1-" << mokKiek << ", 0 - grizti i meniu): ";
-                int nr = ivestiNumeri("mokinio", mokKiek);
-                if (nr == 0) {
-                    break;
-                }
-                string pasalintas = mokVard[nr - 1];
-// Visus po salinamo esancius mokinius perstumiame per viena vieta atgal, kad neliktu tarpo
-                for (int i = nr - 1; i < mokKiek - 1; i++) {
-                    mokVard[i] = mokVard[i + 1];
-                    pazKiek[i] = pazKiek[i + 1];
-                    for (int j = 0; j < pazKiek[i]; j++) {
-                        mokPazym[i][j] = mokPazym[i + 1][j];
+                cout << "Mokinio numeris (1-" << kiekMokiniu << ", 0 - atgal): ";
+                int nr = gautiNumeri(kiekMokiniu);
+                if (nr == 0) break;
+
+                int idx = nr - 1;
+                cout << vardai[idx] << " pazymiai: ";
+                if (pazKiekis[idx] == 0) {
+                    cout << "pazymiu nera";
+                } else {
+                    for (int j = 0; j < pazKiekis[idx]; j++) {
+                        cout << pazymiai[idx][j] << " ";
                     }
                 }
-                mokKiek--;
-                cout << "Mokinys " << pasalintas << " pasalintas. Mokiniu sarase: " << mokKiek << "\n";
+                cout << endl;
                 break;
             }
-            case 7:
-                cout << "Programa baigta.\n";
+
+            case 4: {
+                if (kiekMokiniu == 0) {
+                    cout << "Sarasas tuscias.\n";
+                    break;
+                }
+                cout << "Kurio mokinio pazymi keisti (1-" << kiekMokiniu << ", 0 - atgal)? ";
+                int nr = gautiNumeri(kiekMokiniu);
+                if (nr == 0) break;
+
+                int idx = nr - 1;
+                if (pazKiekis[idx] == 0) {
+                    cout << "Sis mokinys neturi pazymiu.\n";
+                    break;
+                }
+
+                cout << vardai[idx] << " pazymiai:\n";
+                for (int j = 0; j < pazKiekis[idx]; j++) {
+                    cout << "  " << j + 1 << ". " << pazymiai[idx][j] << endl;
+                }
+
+                cout << "Kurio pazymio numeri keisti (1-" << pazKiekis[idx] << ", 0 - atgal)? ";
+                int pnr = gautiNumeri(pazKiekis[idx]);
+                if (pnr == 0) break;
+
+                cout << "Naujas pazymys: ";
+                pazymiai[idx][pnr - 1] = gautiPazymi();
+                cout << "Pazymys pakeistas.\n";
                 break;
+            }
+
+            case 5: {
+                if (kiekMokiniu == 0) {
+                    cout << "Sarasas tuscias.\n";
+                    break;
+                }
+                cout << "Mokinio numeris (1-" << kiekMokiniu << ", 0 - atgal): ";
+                int nr = gautiNumeri(kiekMokiniu);
+                if (nr == 0) break;
+
+                int idx = nr - 1;
+                if (pazKiekis[idx] == 0) {
+                    cout << "Nera pazymiu, negalima apskaiciuoti vidurkio.\n";
+                    break;
+                }
+
+                double suma = 0;
+                for (int j = 0; j < pazKiekis[idx]; j++) {
+                    suma += pazymiai[idx][j];
+                }
+                cout << vardai[idx] << " vidurkis: " << suma / pazKiekis[idx] << endl;
+                break;
+            }
+
+            case 6: {
+                if (kiekMokiniu == 0) {
+                    cout << "Sarasas tuscias.\n";
+                    break;
+                }
+                cout << "Kuri mokini istrinti (1-" << kiekMokiniu << ", 0 - atgal)? ";
+                int nr = gautiNumeri(kiekMokiniu);
+                if (nr == 0) break;
+
+                // Perstumiame likusius elementus i kaire
+                for (int i = nr - 1; i < kiekMokiniu - 1; i++) {
+                    vardai[i] = vardai[i + 1];
+                    pazKiekis[i] = pazKiekis[i + 1];
+                    for (int j = 0; j < pazKiekis[i]; j++) {
+                        pazymiai[i][j] = pazymiai[i + 1][j];
+                    }
+                }
+                kiekMokiniu--;
+                cout << "Mokinys istrintas.\n";
+                break;
+            }
+
+            case 7:
+                cout << "Darbas baigtas.\n";
+                break;
+
             default:
-                cout << "Neteisingas pasirinkimas. Iveskite skaiciu nuo 1 iki 7.\n";
+                cout << "Tokio pasirinkimo nera.\n";
         }
     }
+
     return 0;
 }
